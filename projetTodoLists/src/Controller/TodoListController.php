@@ -89,6 +89,7 @@ class TodoListController extends AbstractController
             $todo  = $form->getData();             
             $todo->setIsDone(false);
             $todo->setUser($this->getUser());
+            $todo->setIsAdmin(true);
             $em->persist($todo);
             $em->flush();
             
@@ -102,6 +103,42 @@ class TodoListController extends AbstractController
             'form' => $form->createView()         
         ]);
     }
+
+
+    /**
+     * @Route("/todo/ajoutUtilisateur/{id}", name="app.todo_utilisateur")
+     */
+    public function ajoutUtilisateur(Request $request,EntityManagerInterface $em,TodoListRepository $repoTodo,$id): Response
+    {
+        $todo = $repoTodo->findByIdField($id);
+
+        $form = $this->createForm(TodoListType::class, $todo[0]);
+
+        $form->handleRequest($request); 
+ 
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Encode the new users password
+            $todo  = $form->getData();             
+            $todo->setIsDone(false);
+            $todo->setUser($this->getUser());
+            $em->persist($todo);
+            $em->flush();
+            
+            return $this->render('todo_list/index.html.twig', [
+                'form' => $form->createView(),
+                'todos' => $repoTodo->findTodoByUserField($this->getUser())
+            ]);
+        }
+
+        return $this->render('todo_list/todo.html.twig', [
+            'form' => $form->createView()         
+        ]);
+    }
+
+
+
+
 
 
 
