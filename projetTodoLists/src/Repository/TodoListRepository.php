@@ -31,6 +31,14 @@ class TodoListRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+    public function findMaxId()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('MAX(t.id)')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
   // /**
     //  * @return TodoList[] Returns an array of TodoList objects
     //  */

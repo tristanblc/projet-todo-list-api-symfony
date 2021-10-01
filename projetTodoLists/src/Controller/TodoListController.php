@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\TodoList;
+use App\Form\NvUserType;
 use App\Form\TodoListType;
+use App\Repository\UserRepository;
 use App\Repository\TodoListRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +23,7 @@ class TodoListController extends AbstractController
         $user = $this->getUser();
         return $this->render('todo_list/index.html.twig', [
             'controller_name' => 'TodoListController',
-            'todos' => $repoTodo->findTodoByUserField($user)
+            'todos' => $user->getTodoLists()
         ]);
     }
 
@@ -42,12 +44,16 @@ class TodoListController extends AbstractController
             $todo  = $form->getData();             
             $todo->setIsDone(false);
             $todo->setUser($this->getUser());
+            $todo->setIsAdmin(true);
+            $todo->addUser($this->getUser());
+            $this->getUser()->addTodoList($todo);
             $em->persist($todo);
+         
             $em->flush();
             
             return $this->render('todo_list/index.html.twig', [
                 'form' => $form->createView(),
-                'todos' => $repoTodo->findTodoByUserField($this->getUser())
+                'todos' => $this->getUser()->getTodoLists()
             ]);
         }
 
@@ -62,13 +68,16 @@ class TodoListController extends AbstractController
     public function deleteTodo(EntityManagerInterface $em,TodoListRepository $repoTodo,$id): Response
     {
         $todo = $repoTodo->findByIdField($id);
+        foreach($todo[0]->getUsers() as $user){
+            $todo[0]->removeUser($user);
+        }
 
         $em->remove($todo[0]);
         $em->flush();
 
         return $this->render('todo_list/index.html.twig', [
             'controller_name' => 'TodoListController',
-            'todos' => $repoTodo->findTodoByUserField($this->getUser())
+            'todos' => $this->getUser()->getTodoLists()
         ]);
     }
 
@@ -90,12 +99,14 @@ class TodoListController extends AbstractController
             $todo->setIsDone(false);
             $todo->setUser($this->getUser());
             $todo->setIsAdmin(true);
+            $this->getUser()->addTodoList($todo);
             $em->persist($todo);
+          
             $em->flush();
             
             return $this->render('todo_list/index.html.twig', [
                 'form' => $form->createView(),
-                'todos' => $repoTodo->findTodoByUserField($this->getUser())
+                'todos' => $this->getUser()->getTodoLists()
             ]);
         }
 
@@ -108,30 +119,48 @@ class TodoListController extends AbstractController
     /**
      * @Route("/todo/ajoutUtilisateur/{id}", name="app.todo_utilisateur")
      */
-    public function ajoutUtilisateur(Request $request,EntityManagerInterface $em,TodoListRepository $repoTodo,$id): Response
+    public function ajoutUtilisateur(Request $request,EntityManagerInterface $em,TodoListRepository $repoTodo,UserRepository $repoUser,$id): Response
     {
         $todo = $repoTodo->findByIdField($id);
-
-        $form = $this->createForm(TodoListType::class, $todo[0]);
-
+        $form = $this->createForm(NvUserType::class);
         $form->handleRequest($request); 
- 
-
         if ($form->isSubmitted() && $form->isValid()) {
-            // Encode the new users password
-            $todo  = $form->getData();             
-            $todo->setIsDone(false);
-            $todo->setUser($this->getUser());
-            $em->persist($todo);
+            if($repoUser->findByEmail($form['email']->getData())){
+            $other_user = $repoUser->findByEmail($form['email']->getData())[0];
+            $new_todo = new TodoList();
+            $new_todo = $todo[0];
+            $new_todo->setId(intval($repoTodo->findMaxId()[0]) + 1);   
+            $new_todo->setIsDone(false);         
+            $new_todo->setIsAdmin(true);
+           
+          
+            $other_user->addTodoList($new_todo);
+            $em->persist($new_todo);
+        
             $em->flush();
             
+           
+         
+           
+
             return $this->render('todo_list/index.html.twig', [
                 'form' => $form->createView(),
-                'todos' => $repoTodo->findTodoByUserField($this->getUser())
+                'todos' =>  $this->getUser()->getTodoLists()
             ]);
+
+            }
+            else{
+                return $this->render('todo_list/index.html.twig', [
+                    'form' => $form->createView(),
+                    'todos' =>  $this->getUser()->getTodoLists()
+                ]);
+            }
+           
+            
+           
         }
 
-        return $this->render('todo_list/todo.html.twig', [
+        return $this->render('todo_list/nv.html.twig', [
             'form' => $form->createView()         
         ]);
     }

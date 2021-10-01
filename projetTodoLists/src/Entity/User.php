@@ -27,9 +27,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     /** 
-     * @Assert\Email(
-     *     message = "L'email '{{ value }}' n'est pas valide"
-     * )
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
@@ -50,13 +47,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity=TodoList::class, mappedBy="user")
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todoLists")
+     */
+    private $users;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=TodoList::class, inversedBy="users")
      */
     private $todolists;
+
+
+
 
     public function __construct()
     {
         $this->todolists = new ArrayCollection();
+        $this->todoLists = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
 
@@ -164,12 +171,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
 
-    public function setTodolists(?TodoList $todolists): self
+    public function setTodolists(?TodoList $todoLists): self
     {
-        $this->todolists = $todolists;
+        $this->todoLists = $todoLists;
 
         return $this;
     }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getTodoLists(): Collection
+    {
+        return $this->todolists;
+    }
+
+    public function addTodoList(TodoList $todoList): self
+    {
+        if (!$this->todolists->contains($todoList)) {
+            $this->todolists->add($todoList);
+        }
+
+        return $this;
+    }
+
+    public function removeTodoList(TodoList $todoList): self
+    {
+        $this->todolists->removeElement($todoList);
+
+        return $this;
+    }
+
+ 
+  
 
 
 }

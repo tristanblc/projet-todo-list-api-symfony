@@ -39,6 +39,9 @@
              <div class="flex mb-4 items-center">
             <p class="w-full text-grey-darkest"></p>  {% if todo.isAdmin %}   <a class="text-center block border border-blue-500 rounded py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white" href="{{ path('app.todo_modify', {'id': todo.id } ) }}">Modifier</a>{% endif %}
              </div>
+               <div class="flex mb-4 items-center">
+            <p class="w-full text-grey-darkest"></p>  {% if todo.isAdmin %}   <a class="text-center block border border-blue-500 rounded py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white" href="{{ path('app.todo_utilisateur', {'id': todo.id } ) }}">Ajouter un utilisateur</a>{% endif %}
+             </div>
         </div>
         
     </div>

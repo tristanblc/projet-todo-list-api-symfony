@@ -45,20 +45,22 @@ class TodoList
      */
     private $isDone;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="todolists")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
+   
 
     /**
      * @ORM\Column(type="boolean")
      */
     private $isAdmin;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todolists")
+     */
+    private $users;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,6 +152,45 @@ class TodoList
     public function setIsAdmin(bool $isAdmin): self
     {
         $this->isAdmin = $isAdmin;
+
+        return $this;
+    }
+
+    /**
+     * Set the value of id
+     *
+     * @return  self
+     */ 
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeTodolist($this);
+        }
 
         return $this;
     }
