@@ -1,0 +1,76 @@
+
+<title>Gérer les image</title>
+
+{% block body %}
+
+{% include 'base.html.twig'%}
+{% include 'nav/navbar.html.twig'%}
+
+
+
+{% block content %}
+<br>
+ 
+<ul class="flex">
+<br>
+  <li class="flex-1 mr-2">
+    
+  </li>
+  <li class="flex-1 mr-2">
+   <a class="text-center block border border-green-500 rounded py-2 px-4 bg-green-500 hover:bg-green-700 text-white" href="{{path('app_televerser')}}">Ajouter</a>
+  </li>
+  <li class="text-center flex-1">
+   
+  </li>
+</ul>
+<br>
+<section class="container mx-auto p-6 font-mono">
+
+  <div class="w-full mb-8 overflow-hidden rounded-lg shadow-lg">
+    <div class="w-full overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="text-md font-semibold tracking-wide text-left text-gray-900 bg-gray-100 uppercase border-b border-gray-600">
+            <th class="px-4 py-3">Libelle</th>
+            <th class="px-4 py-3">Date</th>
+            <th class="px-4 py-3">Image</th>
+            <th class="px-4 py-3">Option</th>
+          </tr>
+        </thead>
+  <!-- Table head -->
+
+  <!-- Table body -->
+  
+  <tbody>
+    <tr>
+  
+      {% for image in lesImages %}
+
+        <tbody class="bg-white">
+          <tr class="text-gray-700">
+            <td class="px-4 py-3 border">
+              <div class="flex items-center text-sm">
+                <div>
+                  <p class="font-semibold text-black">{{ image.libelle}}</p>
+                 
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-ms font-semibold border">{{ image.datetime.format('d/m/Y') }}</td>
+            <td class="px-4 py-3 text-xs border">
+               <img src="../../../../../{{asset(image.src) }}" style="height:50px;">
+             
+            </td>
+            <td class="px-4 py-3 text-ms font-semibold border"><a type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-full" href="{{ path('app_supprimer', {'id': image.id}) }}">Supprimer</a>  <a type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-full" href="{{ path('app_modifier', {'id': image.id}) }}">Modifier</a></td>
+          </tr>
+    {% endfor %}
+      </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+    </div>
+  </div>
+{% endblock %}
+{% endblock %}
