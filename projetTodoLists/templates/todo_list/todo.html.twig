@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une todo list{% endblock %}
+
+{% block body %}
+{% include 'nav/navbar.html.twig'%}
+
+    {{ form_start(form) }}
+
+    <!-- component -->
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+    <div class="mb-4">
+    {{ form_row(form.name,{'attr': {'class': 'shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3'}}) }}
+    </div>
+    <div class="mb-6">
+    {{ form_row(form.topic,{'attr': {'class': 'shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3'}}) }}
+
+    </div>
+    <div class="mb-6">
+    {{ form_row(form.dateFin,{'attr': {'class': 'form-control flatpickr-input'}}) }}
+
+    </div>
+    <div class="mb-6">
+    {{ form_row(form.contenu,{'attr': {'class': 'shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3'}}) }}
+
+    </div>
+   <input type="hidden" name="_csrf_token"
+           value="{{ csrf_token('authenticate') }}"
+    >
+    <div class="flex items-center justify-between">
+   <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-full" type="submit">
+        Ajouter
+    </button>
+    </div>
+    {{ form_end(form)}}
+</div>
+
+{% endblock %}

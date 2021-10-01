@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+              <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.16/base.css" integrity="sha512-1U07ySJ6HsanU3Fi/5mMmbIL1MBABodlWrEaWHxPaH6+U8jFunyHb3TzBO89wWl3zZh1IM2QDHSYvkCjRjUhfA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.16/tailwind.css" integrity="sha512-LWgVLC8k+AFExd4g23Pa58UShCQCaK0BNYXe7OMXrqpej80d7Ve3mkItvje/wNjXZrQAW1t92a9L4QgHfYNOXg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            
+            
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+            {#{{ encore_entry_script_tags('app') }}#}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>
