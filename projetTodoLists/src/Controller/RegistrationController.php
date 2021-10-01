@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,5 +48,43 @@ class RegistrationController extends AbstractController
         return $this->render('registration/index.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+     /**
+     * @Route("/modifier/", name="app.modifier_profil",method="GET")
+     */
+    public function modifierProfil(Request $request)
+    {
+        $user = $this->getUser() ;
+
+       
+        $form = $this->createForm(UserType::class, $user);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $new_user = new User();
+            $new_user =$user;
+            // Encode the new users password
+            $new_user->setPassword($this->passwordEncoder->encodePassword($user, $form['password']->getData()));
+            $new_user->setEmail($form['email']->getData());
+
+
+
+            // Save
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($user);
+            $em->persist($new_user);
+            $em->flush();
+
+            return $this->render('home/home.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+        return $this->render('profil/index.html.twig', [
+            'form' => $form->createView()
+        ]);
+        
     }
 }
