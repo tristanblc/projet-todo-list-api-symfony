@@ -2,14 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\TodoListRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TodoListRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * ApiResource()
  * @ORM\Entity(repositoryClass=TodoListRepository::class)
+ * * @ApiResource(
+ *  normalizationContext={"groups"={"user:read"}},
+ *  denormalizationContext={"groups"={"user:write"}})
  */
+ 
 class TodoList
 {
     /**
@@ -21,27 +28,32 @@ class TodoList
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read", "user:write"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user:read", "user:write"})
      */
     private $topic;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"user:read", "user:write"})
      */
     private $dateFin;
 
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"user:read", "user:write"})
      */
     private $contenu;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"user:read", "user:write"})
      */
     private $isDone;
 
@@ -53,7 +65,7 @@ class TodoList
     private $isAdmin;
 
     /**
-     * 
+     * @Groups({"user:write"})
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todolists")
      */
     private $users;

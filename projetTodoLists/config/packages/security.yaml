@@ -20,19 +20,32 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         
     firewalls:
+        api:
+            pattern: ^/api/login
+            json_login:
+                check_path : api_login_check
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+           
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginFormAuthenticator
-            logout:
-                path: app_logout
-                target: /
                 # where to redirect after logout
                 # target: app_any_route
 
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+        
+    
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
 
@@ -42,9 +55,12 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         - { path: ^/todo, roles: IS_AUTHENTICATED_FULLY }
-         - { path: ^/image, roles: ROLE_ADMIN }
-         - { path: ^/admin, roles: ROLE_ADMIN }
-         - { path: ^/admin/todo, roles: ROLE_ADMIN }
-         - { path: ^/admin/user, roles: ROLE_ADMIN }
+        - { path: ^/ , roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+       
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+       
+        
+             
+       
         # - { path: ^/profile, roles: ROLE_USER }

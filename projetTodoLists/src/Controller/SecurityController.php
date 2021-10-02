@@ -29,8 +29,11 @@ class SecurityController extends AbstractController
     /**
      * @Route("/logout", name="app_logout")
      */
-    public function logout(): void
+    public function logout(): Response
     {
-        throw new \LogicException("Vous etes deconnecté");
+        $this->get('session')->remove('user');
+        /* pour tout supprimer */
+        $this->get('session')->clear();
+        return $this->redirectToRoute('app_login'); 
     }
 }

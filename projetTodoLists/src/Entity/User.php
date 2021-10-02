@@ -2,20 +2,57 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\TodoList;
+use App\Controller\LoginAction;
+use App\Controller\LogoutAction;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity("email")
+ * @ApiResource(
+ *   normalizationContext  = {"groups" = {"user:read"}},
+ *   denormalizationContext = {"groups" = {"user:write"}},
+ *    itemOperations ={
+ *        "get" ={
+ *              "security" = "is_granted('ROLE_ADMIN')",
+ *             "denormalization_context" = {"groups" = {"admin:read"}}
+ *        }        
+ *     },
+ *    collectionOperations={ 
+ *          "get" = {
+ *                "security" = "is_granted('ROLE_ADMIN')",
+ *                "denormalization_context" = {"groups" = {"user:read"}}
+ *           },
+ *          "post" ={
+ *             "method" = "POST",
+ *             "security" = "is_granted('ROLE_ADMIN')",
+ *             "denormalization_context" = {"groups" = {"user:write"}},
+ *             "validation_groups" = {"create"}
+ *           },
+ *          "logout" = {
+ *             "method" = "POST",
+ *             "deserialize" = false,
+ *             "path" = "/logout",
+ *             "controller" = LogoutAction::class,
+ *             "denormalization_context" = {"groups" = {"user:logout"}},
+ *             "read"=true
+ *          }
+ * }
+ *  
+ * );
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -23,16 +60,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("admin:read")
+     * @Groups("user:read")
      */
     private $id;
 
     /** 
+     *
+     * @Assert\Email(
+     *     message = "The email '{{ value }}' is not a valid email."
+     * )
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user:read", "user:write","admin:read"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups("admin:read")
+     * @Groups("user:read")
+     * 
      */
     private $roles = [];
 
@@ -42,20 +89,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *  message="Mot de passe pas assez fort"
      * ),
      * @var string The hashed password
+     * @SerializedName("password")
      * @ORM\Column(type="string")
+     * 
      */
     private $password;
 
-    /**
+     /**
      * 
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todoLists")
+     * 
      */
     private $users;
+  
 
     /**
      * @ORM\ManyToMany(targetEntity=TodoList::class, inversedBy="users")
+     *  * @Groups("user:read")
+     * 
      */
     private $todolists;
+
+    /**
+     * @SerializedName("password")
+     * @Assert\Regex(
+     *  pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
+     *  message="Mot de passe pas assez fort"
+     * ),
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:write")
+     */
+    private $plainpassword;
 
 
 
@@ -155,7 +219,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getTodoList(): ?TodoList
@@ -207,4 +271,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   
 
 
+
+    /**
+     * Get pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
+     */ 
+    public function getPlainpassword()
+    {
+        return $this->plainpassword;
+    }
+
+    /**
+     * Set pattern="/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{7,}/",
+     *
+     * @return  self
+     */ 
+    public function setPlainpassword($plainpassword)
+    {
+        $this->plainpassword = $plainpassword;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of users
+     */ 
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * Set the value of users
+     *
+     * @return  self
+     */ 
+    public function setUsers($users)
+    {
+        $this->users = $users;
+
+        return $this;
+    }
 }
