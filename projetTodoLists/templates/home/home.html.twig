@@ -5,6 +5,187 @@
 
 {% block body %}
 {% include 'nav/navbar.html.twig'%}
+ <style>
+        
+
+html {
+  box-sizing: border-box;
+  overflow: hidden;
+  color: #2a2a2a;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  
+}
 
 
+#slider {
+  margin-left:115px;
+  overflow: hidden;
+ 
+}
+
+#slider ul {
+  list-style: none;
+}
+
+#slider ul li {
+
+  width:1500px;
+  float: left;
+}
+
+
+#slider ul li img {
+    margin:auto;
+  height: auto;
+  width: auto;
+} 
+
+a.control_prev, a.control_next {
+  background: rgba(0,0,0,0.3);
+  border-radius: 50%;
+  top: 40%;
+}
+
+a.control_prev:hover, a.control_next:hover {
+  -webkit-transition: all 0.2s ease;
+}
+
+a.control_next {
+  right: 0;
+}
+
+
+
+.active {
+    background-color: #48BB78;
+  opacity: 1;
+}
+    {% set i = 1 %}
+    {% for image in lesImages %}
+
+    #s{{i}} {
+  padding: 6px;
+  left: 50%;
+  bottom: 50px;
+
+  border-radius: 20px;
+  z-index: 999;
+}
+
+#Slide{{i}}:checked + #s{{i}} {
+  background-color: #48BB78;
+  opacity: 1;
+}
+         
+
+           {% set i = i + 1 %}
+          {% endfor %}
+
+
+
+
+        
+      </style>
+
+
+<div id="slider" class="relative ">
+ 
+        {% set i = 1 %}
+        {% for image in lesImages %}
+           <div  id ="slider"  data-interval="true">
+          <!--Slide 1-->
+          <input id="slide" class="carousel-open" type="radio" id="carousel-{{ i }}" name="carousel" aria-hidden="true" hidden=""
+            checked="checked">
+          <div class="carousel-item absolute opacity-0 bg-center" style="background-repeat: no-repeat; background-image: url( {{  image.src }}) ">
+          
+          </div>
+         
+           {% set i = i + 1 %}
+          {% endfor %}
+  <a href="#" class="control_next absolute lg:block p-4 m-4 z-40 cursor-pointer text-white hover:text-green-500">		  
+  		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32px">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+</svg>
+</a>
+  <a href="#" class="control_prev absolute lg:block p-4 m-4 z-40 cursor-pointer text-white hover:text-green-500">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="32px">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+</svg>
+  </a>
+  <ul class="relative">
+    {% for image in lesImages %}
+    <li class="relative block m-0 p-0 text-center"><img style=" background-repeat: no-repeat; width:100%"src="{{ image.src}}" alt=""></li>
+    {% endfor %}
+
+  </ul>  
+</div>
+</div>
+
+      <script>
+ jQuery(document).ready(function ($) {
+
+  var interval = setInterval(function () {
+        moveRight();
+    }, 6000);
+  
+	var slideCount = $('#slider ul li').length;
+	var slideWidth = $('#slider ul li').width();
+	var slideHeight = $('#slider ul li').height();
+	var sliderUlWidth = slideCount * slideWidth;
+	
+	$('#slider').css({ width: slideWidth, height: slideHeight });
+	
+	$('#slider ul').css({ width: sliderUlWidth, marginLeft: - slideWidth });
+	
+    $('#slider ul li:last-child').prependTo('#slider ul');
+
+    function moveLeft() {
+        $('#slider ul').animate({
+            left: + slideWidth
+        }, 200, function () {
+            $('#slider ul li:last-child').prependTo('#slider ul');
+            $('#slider ul').css('left', '');
+        });
+    };
+
+    function moveRight() {
+        $('#slider ul').animate({
+            left: - slideWidth
+        }, 200, function () {
+            $('#slider ul li:first-child').appendTo('#slider ul');
+            $('#slider ul').css('left', '');
+
+        });
+    };
+
+    $('a.control_prev').click(function () {
+        moveLeft();
+    });
+
+    $('a.control_next').click(function () {
+        moveRight();
+    });
+  
+  
+  // Doesn't work quite yet (toggles random slide and only onClick) -->
+  
+  // $('input').click(function() {
+  //  $('label').toggleClass('checked');
+  //  moveRight();
+  // });
+  
+  $("#slider ul").click(function(){
+    //Stop the carousel on click
+    clearInterval(interval);
+  });
+});    
+
+      
+      </script>
 {% endblock %}
