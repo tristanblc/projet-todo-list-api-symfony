@@ -44,4 +44,7 @@ security:
     access_control:
          - { path: ^/todo, roles: IS_AUTHENTICATED_FULLY }
          - { path: ^/image, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin/todo, roles: ROLE_ADMIN }
+         - { path: ^/admin/user, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

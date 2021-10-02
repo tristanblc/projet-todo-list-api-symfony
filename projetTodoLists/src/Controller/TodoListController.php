@@ -80,6 +80,7 @@ class TodoListController extends AbstractController
             'todos' => $this->getUser()->getTodoLists()
         ]);
     }
+    
 
      /**
      * @Route("/todo/modify/{id}", name="app.todo_modify")
@@ -162,6 +163,101 @@ class TodoListController extends AbstractController
 
         return $this->render('todo_list/nv.html.twig', [
             'form' => $form->createView()         
+        ]);
+    }
+
+
+     /**
+     * @Route("/admin/todo/", name="app.todo_admin")
+     */
+    public function adminTodo(UserRepository $repo): Response
+    {
+        $todos = [];
+        foreach($repo->findAll() as $user){
+            foreach($user->getTodoLists() as $todo){
+                array_push($todos,$todo);
+            }
+           
+        }
+ 
+    
+        return $this->render('admin/todo/menuAdminTodo.html.twig', [
+            'controller_name' => 'TodoListController',
+            'todos' =>  $todos
+        ]);
+    }
+
+
+       /**
+     * @Route("/admin/todo/delete/{id}", name="app.todo_delete_admin")
+     */
+    public function deleteadminTodo(EntityManagerInterface $em,TodoListRepository $repoTodo,$id,UserRepository $repo): Response
+    {
+        
+        $todo = $repoTodo->findByIdField($id);
+        foreach($todo[0]->getUsers() as $user){
+            $todo[0]->removeUser($user);
+        }
+
+        $em->remove($todo[0]);
+        $em->flush();
+
+        $todose = [];
+        foreach($repo->findAll() as $user){
+            foreach($user->getTodoLists() as $todo){
+                array_push($todose,$todo);
+            }
+           
+        }
+ 
+
+        return $this->render('admin/todo/menuAdminTodo.html.twig', [
+            'controller_name' => 'TodoListController',
+            'todos' =>  $todose
+        ]);
+    }
+
+
+    
+     /**
+     * @Route("admin/todo/modify/{id}", name="app.todo_modify_admin")
+     */
+    public function modifyAdminTodo(Request $request,EntityManagerInterface $em,TodoListRepository $repoTodo,$id,UserRepository $repoUser): Response
+    {
+        $todo = $repoTodo->findByIdField($id);
+
+        $form = $this->createForm(TodoListType::class, $todo[0]);
+
+        $form->handleRequest($request); 
+ 
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Encode the new users password
+            $todo  = $form->getData();             
+            $todo->setIsDone(false);
+            $todo->setUser($this->getUser());
+            $todo->setIsAdmin(true);
+            $this->getUser()->addTodoList($todo);
+            $em->persist($todo);
+          
+            $em->flush();
+            
+        $todose = [];
+        foreach($repoUser->findAll() as $user){
+            foreach($user->getTodoLists() as $todo){
+                array_push($todose,$todo);
+            }
+           
+        }
+            
+            return $this->render('admin/todo/menuAdminTodo.html.twig', [
+                'form' => $form->createView(),
+                'todos' => $todose
+            ]);
+        }
+
+        return $this->render('todo_list/todo.html.twig', [
+            'form' => $form->createView(),       
         ]);
     }
 

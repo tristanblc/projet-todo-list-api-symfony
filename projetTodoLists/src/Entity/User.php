@@ -47,6 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $password;
 
     /**
+     * 
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todoLists")
      */
     private $users;

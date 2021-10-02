@@ -1,0 +1,59 @@
+
+<title>Gérer les todos</title>
+
+{% block body %}
+
+{% include 'base.html.twig'%}
+{% include 'nav/navbar.html.twig'%}
+
+
+
+{% block content %}
+<br>
+ 
+<ul class="flex">
+<br>
+
+<br>
+<section class="container mx-auto p-6 font-mono">
+
+  <div class="w-full mb-8 overflow-hidden rounded-lg shadow-lg">
+    <div class="w-full overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="text-md font-semibold tracking-wide text-left text-gray-900 bg-gray-100 uppercase border-b border-gray-600">
+            <th class="px-4 py-3">Email</th>
+            <th class="px-4 py-3">Password</th>
+            <th class="px-4 py-3">Options</th>
+          </tr>
+        </thead>
+  <!-- Table head -->
+
+  <!-- Table body -->
+  
+  <tbody>
+    <tr>
+  
+      {% for user in users %}
+
+        <tbody class="bg-white">
+          <tr class="text-gray-700">
+           
+           <td class="px-4 py-3 text-ms font-semibold border">{{ user.email }}</td>
+                
+            <td class="px-4 py-3 text-ms font-semibold border">{{ user.Password}}</td>  
+
+           
+            <td class="px-4 py-3 text-ms font-semibold border"><a type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-full" href="{{ path('app.modifier_profil_admin', {'id': user.id}) }}">Modifier</a></td>
+          </tr>
+    {% endfor %}
+      </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+    </div>
+  </div>
+{% endblock %}
+{% endblock %}

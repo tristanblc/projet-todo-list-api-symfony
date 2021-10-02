@@ -53,6 +53,7 @@ class TodoList
     private $isAdmin;
 
     /**
+     * 
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todolists")
      */
     private $users;

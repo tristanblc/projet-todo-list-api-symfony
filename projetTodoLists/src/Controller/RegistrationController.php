@@ -51,7 +51,7 @@ class RegistrationController extends AbstractController
     }
 
      /**
-     * @Route("/modifier/", name="app.modifier_profil",method="GET")
+     * @Route("/modifier/", name="app.modifier_profil")
      */
     public function modifierProfil(Request $request)
     {
@@ -80,6 +80,56 @@ class RegistrationController extends AbstractController
 
             return $this->render('home/home.html.twig', [
                 'form' => $form->createView(),
+            ]);
+        }
+        return $this->render('profil/index.html.twig', [
+            'form' => $form->createView()
+        ]);
+        
+    }
+
+
+    /**
+     * @Route("/admin/user/", name="app.user_admin")
+     */
+    public function adminUser(UserRepository $rep)
+    {
+        return $this->render('admin/user/menuUser.html.twig', [
+            'controller_name' => 'RegistrationController',
+            'users' =>  $rep->findAll()
+        ]);
+    }
+     /**
+     * @Route("/admin/user/modifier/{id}", name="app.modifier_profil_admin")
+     */
+    public function modifierUserProfil(Request $request,UserRepository $rp,$id)
+    {
+        $user = $rp->findOneBy(['id' => $id]);
+
+       
+        $form = $this->createForm(UserType::class, $user);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $new_user = new User();
+            $new_user =$user;
+            // Encode the new users password
+            $new_user->setPassword($this->passwordEncoder->encodePassword($user, $form['password']->getData()));
+            $new_user->setEmail($form['email']->getData());
+
+
+
+            // Save
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($user);
+            $em->persist($new_user);
+            $em->flush();
+
+            return $this->render('admin/user/menuUser.html.twig', [
+                'form' => $form->createView(),
+                'users' => $rp->findAll()
             ]);
         }
         return $this->render('profil/index.html.twig', [
