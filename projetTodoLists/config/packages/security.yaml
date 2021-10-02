@@ -20,7 +20,7 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         
     firewalls:
-        api:
+        login:
             pattern: ^/api/login
             json_login:
                 check_path : api_login_check
@@ -28,11 +28,17 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        car:
+            pattern:  ^/api
+            stateless: true
+            anonymous: false
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-           
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginFormAuthenticator
