@@ -15,6 +15,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * * @ApiResource(
  *  normalizationContext={"groups"={"user:read"}},
  *  denormalizationContext={"groups"={"user:write"}})
+ * itemOperations ={
+ *        "get" ={
+ *             "denormalization_context" = {"groups" = {"user:read"}}
+ *        },
+ *        "delete" = {
+ *        "security" = "is_granted('ROLE_ADMIN')",
+ *        "denormalization_context" = {"groups" = {"admin:read"}}},
+ *        "put" ={
+ *        "security" = "is_granted('ROLE_ADMIN')",
+ *        "denormalization_context" = {"groups" = {"admin:write"}}}
+ * 
+ * 
+
+ *     },
+ *    collectionOperations={ 
+ *          "get" = {
+ *                "denormalization_context" = {"groups" = {"user:read"}}
+ *           },
+ *          "post" ={
+ *             "method" = "POST",
+ *             "security" = "is_granted('ROLE_ADMIN')",
+ *             "denormalization_context" = {"groups" = {"admin:write"}},
+ *             "validation_groups" = {"create"}
+ *           },
  */
  
 class TodoList
@@ -23,24 +47,28 @@ class TodoList
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"admin:read","admin:write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user:read", "user:write"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user:read", "user:write"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $topic;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"user:read", "user:write"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $dateFin;
 
@@ -48,12 +76,14 @@ class TodoList
     /**
      * @ORM\Column(type="text")
      * @Groups({"user:read", "user:write"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $contenu;
 
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"user:read", "user:write"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $isDone;
 
@@ -61,12 +91,14 @@ class TodoList
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"admin:read","admin:write"})
      */
     private $isAdmin;
 
     /**
-     * @Groups({"user:write"})
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todolists")
+     * @Groups({"user:read"})
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todolists",cascade={"persist"})
+     * @Groups({"admin:read","admin:write"})
      */
     private $users;
 

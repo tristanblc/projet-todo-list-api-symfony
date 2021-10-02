@@ -97,14 +97,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
      /**
      * 
-     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todoLists")
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="todoLists",cascade={"persist"})
      * 
      */
     private $users;
   
 
     /**
-     * @ORM\ManyToMany(targetEntity=TodoList::class, inversedBy="users")
+     * @ORM\ManyToMany(targetEntity=TodoList::class, inversedBy="users",cascade={"persist"})
      *  * @Groups("user:read")
      * 
      */
@@ -121,6 +121,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $plainpassword;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Booking::class, mappedBy="users")
+     */
+    private $bookings;
+
 
 
 
@@ -129,6 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->todolists = new ArrayCollection();
         $this->todoLists = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
 
@@ -308,6 +314,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsers($users)
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Booking[]
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): self
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings[] = $booking;
+            $booking->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): self
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getUsers() === $this) {
+                $booking->setUsers(null);
+            }
+        }
 
         return $this;
     }

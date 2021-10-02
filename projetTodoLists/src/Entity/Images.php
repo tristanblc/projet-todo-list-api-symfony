@@ -2,10 +2,42 @@
 
 namespace App\Entity;
 
-use App\Repository\ImagesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ImagesRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * @ApiResource(
+ *   normalizationContext  = {"groups" = {"user:read"}},
+ *   denormalizationContext = {"groups" = {"user:write"}},
+ *    itemOperations ={
+ *        "get" ={
+ *             "denormalization_context" = {"groups" = {"user:read"}}
+ *        },
+ *        "delete" = {
+ *        "security" = "is_granted('ROLE_ADMIN')",
+ *        "denormalization_context" = {"groups" = {"admin:read"}}},
+ *        "put" ={
+ *        "security" = "is_granted('ROLE_ADMIN')",
+ *        "denormalization_context" = {"groups" = {"admin:write"}}}
+ * 
+ * 
+
+ *     },
+ *    collectionOperations={ 
+ *          "get" = {
+ *                "denormalization_context" = {"groups" = {"user:read"}}
+ *           },
+ *          "post" ={
+ *             "method" = "POST",
+ *             "security" = "is_granted('ROLE_ADMIN')",
+ *             "denormalization_context" = {"groups" = {"admin:write"}},
+ *             "validation_groups" = {"create"}
+ *           },
+ *         
+ * }
+ * )
  * @ORM\Entity(repositoryClass=ImagesRepository::class)
  */
 class Images
@@ -14,21 +46,32 @@ class Images
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("admin:read")
+     * @Groups("admin:write")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("user:read")
+     * @Groups("admin:read")
+     * @Groups("admin:write")
      */
     private $src;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("user:read")
+     * @Groups("admin:read")
+     * @Groups("admin:write")
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("user:read")
+     * @Groups("admin:read")
+     * @Groups("admin:write")
      */
     private $datetime;
 

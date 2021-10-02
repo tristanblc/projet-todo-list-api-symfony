@@ -63,10 +63,10 @@ security:
     access_control:
         - { path: ^/ , roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-       
+        - { path: ^/car, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
-       
-        
+        - { path: ^/image, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
              
        
         # - { path: ^/profile, roles: ROLE_USER }
